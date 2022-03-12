@@ -58,11 +58,13 @@ admin = Admin(app)
 
 
 from app import views  # conect views
-from app.models import User, Movie  # conect model for migrations
+from app.models import User, Movie, Genre, Producer  # conect model for migrations
 
 # add model in see admin panel
 admin.add_view(ModelView(User, db.session))
 admin.add_view(ModelView(Movie, db.session))
+admin.add_view(ModelView(Genre, db.session))
+admin.add_view(ModelView(Producer, db.session))
 
 
 docs.register(views.get_list)

@@ -17,13 +17,16 @@ class Config(object):
     STATIC_FOLDER = os.path.join(ROOT_PATH, 'static')
     TEMPLATES_FOLDER = os.path.join(ROOT_PATH, 'templates')
 
-    FOLDER_USER = os.path.join(STATIC_FOLDER, 'media', 'user')
+    FOLDER_MEDIA = ('media')
 
+    FOLDER_USER = os.path.join(FOLDER_MEDIA, 'user')
+    FOLDER_MOVIE = os.path.join(FOLDER_MEDIA, 'movie')
+    FOLDER_GENRE = os.path.join(FOLDER_MEDIA, 'genre')
+    FOLDER_PRODUCER = os.path.join(FOLDER_MEDIA, 'producer')
 
-    MEDIA_FOLDER_USER = 'media/user/'
 
     ALLOWED_EXTENSIONS = ["jpg", "png", "jpeg"]
-    MAX_CONTENT_LENGTH = 1000 * 1024  # 1 mb
+    MAX_CONTENT_LENGTH = 3000 * 1024  # 3 mb
 
 
     # number_items_page = 3

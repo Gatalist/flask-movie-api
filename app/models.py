@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from settings import Config
 import os
 from werkzeug.utils import secure_filename
+import uuid
 
 
 class User(UserMixin, db.Model):
@@ -24,15 +25,15 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-
-    def save_image(self, img):
-        path = Config.FOLDER_USER + secure_filename(img.filename)
-        print(path)
-        img.save(path)
-        self.image = Config.MEDIA_FOLDER_USER + secure_filename(img.filename)
     
+    def save_image(self, img):
+        type_file = img.filename.split('.')[-1]
+        img.filename = str(uuid.uuid4()) + '.' + type_file
+        img.save(os.path.join(Config.STATIC_FOLDER, Config.FOLDER_USER, secure_filename(img.filename)))
+        self.poster = os.path.join(Config.FOLDER_USER, secure_filename(img.filename))
+        
     def get_image(self):
-        return self.image
+        return self.poster
 
 
 @login.user_loader
@@ -51,13 +52,13 @@ class Genre(UserMixin, db.Model):
         return self.name
 
     def save_image(self, img):
-        path = Config.FOLDER_USER + secure_filename(img.filename)
-        print(path)
-        img.save(path)
-        self.image = Config.MEDIA_FOLDER_USER + secure_filename(img.filename)
-    
+        type_file = img.filename.split('.')[-1]
+        img.filename = str(uuid.uuid4()) + '.' + type_file
+        img.save(os.path.join(Config.STATIC_FOLDER, Config.FOLDER_GENRE, secure_filename(img.filename)))
+        self.poster = os.path.join(Config.FOLDER_GENRE, secure_filename(img.filename))
+
     def get_image(self):
-        return self.image
+        return self.poster
 
 
 class Producer(UserMixin, db.Model):
@@ -71,13 +72,13 @@ class Producer(UserMixin, db.Model):
         return self.name
 
     def save_image(self, img):
-        path = Config.FOLDER_USER + secure_filename(img.filename)
-        print(path)
-        img.save(path)
-        self.image = Config.MEDIA_FOLDER_USER + secure_filename(img.filename)
+        type_file = img.filename.split('.')[-1]
+        img.filename = str(uuid.uuid4()) + '.' + type_file
+        img.save(os.path.join(Config.STATIC_FOLDER, Config.FOLDER_PRODUCER, secure_filename(img.filename)))
+        self.poster = os.path.join(Config.FOLDER_PRODUCER, secure_filename(img.filename))
     
     def get_image(self):
-        return self.image
+        return self.poster
 
 
 # class Rating(UserMixin, db.Model):
@@ -103,4 +104,13 @@ class Movie(db.Model):
     publication = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     def __repr__(self):
-        return self.body
+        return self.title
+
+    def save_image(self, img):
+        type_file = img.filename.split('.')[-1]
+        img.filename = str(uuid.uuid4()) + '.' + type_file
+        img.save(os.path.join(Config.STATIC_FOLDER, Config.FOLDER_MOVIE, secure_filename(img.filename)))
+        self.poster = os.path.join(Config.FOLDER_MOVIE, secure_filename(img.filename))
+
+    def get_image(self):
+        return self.poster

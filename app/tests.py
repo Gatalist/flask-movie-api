@@ -1,5 +1,5 @@
 from app import client
-from app.models import Post
+from app.models import Movie
 from datetime import datetime
 
 
@@ -8,7 +8,7 @@ def test_get():
 
     assert res.status_code == 200
 
-    assert len(res.get_json()) == len(Post.query.all())
+    assert len(res.get_json()) == len(Movie.query.all())
     assert res.get_json()[0]['id'] == 1
 
 
