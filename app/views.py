@@ -42,6 +42,7 @@ def update_tutorial(tutorial_id, **kwargs):
         return {'message': 'No tutorials with this id'}, 400
     for key, value in kwargs.items():
         setattr(item, key, value)
+    
     session.commit()
 
     return item
@@ -53,10 +54,13 @@ def update_tutorial(tutorial_id, **kwargs):
 def delete_tutorial(tutorial_id):
     user_id = current_user.id
     item = Movie.query.filter(Movie.id==tutorial_id, Movie.user_id==user_id).first()
+    
     if not item:
         return {'message': 'No tutorials with this id'}, 400
+    
     db.session.delete(item)
     db.session.commit()
+    
     return '', 204
 
 
@@ -72,19 +76,24 @@ def index():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
+    
     form = LoginForm()
-    print(form)
+
     if form.validate_on_submit():
         user = User.query.filter_by(name=form.name.data).first()
-        print(form.name.data)
+
         if user is None or not user.check_password(form.password.data):
             flash('Invalid name or password')
             return redirect(url_for('login'))
+        
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
+        
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
+        
         return redirect(next_page)
+    
     return render_template('login.html', title='Sign In', form=form)
 
 
@@ -98,7 +107,9 @@ def logout():
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
+    
     form = RegistrationForm()
+    
     if form.validate_on_submit():
         user = User(name=form.name.data, email=form.email.data)
         user.set_password(form.password.data)
@@ -106,7 +117,9 @@ def register():
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user!')
+        
         return redirect(url_for('login'))
+    
     return render_template('register.html', title='Register', form=form)
 
 
@@ -122,11 +135,22 @@ def user(name):
 @app.route('/movie', methods=['GET'])
 @login_required
 def movie():
-    movies = Movie.query.all()
-    return render_template('movie_list.html', movies=movies)
+    q = request.args.get('q')
+    page = request.args.get('page', 1, type=int)
+
+    if q:
+        movies = Movie.query.filter(Movie.title.contains(q) | Movie.body.contains(q))
+    else:
+        movies = Movie.query
+
+    pages = movies.paginate(page, 10, False)
+
+    return render_template('movie_list.html', movies=movies, pages=pages)
+
 
 @app.route('/movie/<slug>', methods=['GET'])
 @login_required
 def model_detail(slug):
     movie = Movie.query.filter(Movie.slug==slug).first()
+    
     return render_template('movie_detail.html', movie=movie)

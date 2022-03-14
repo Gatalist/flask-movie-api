@@ -8,8 +8,11 @@
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('movie') }}">All films</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('get_list') }}">API</a>
+        </li>
       </ul>
-      <form action="url_for('search')" class="d-flex">
+      <form action="{{ url_for('movie') }}" class="d-flex">
         <input class="form-control me-2" type="search" placeholder="Search" name="q" value="{{ request.args.get('q', '') }}" aria-label="Search">
       </form>
       {% if current_user.name %}

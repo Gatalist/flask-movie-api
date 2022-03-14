@@ -123,7 +123,6 @@ class Movie(db.Model):
 
     def get_absolute_url(self):
         return f'/movie/{self.slug}'
-        # return self.slug
 
     # def __setattr__(self, key, value):
     #     super(Movie, self).__setattr__(key, value)

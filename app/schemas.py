@@ -11,7 +11,13 @@ class UserSchema(Schema):
 
 class VideoSchema(Schema):
     id = fields.Integer(dump_only=True)
-    body = fields.String(required=True, validate=[validate.Length(max=140)])
+    title = fields.String(required=True, validate=[validate.Length(max=100)])
+    slug = fields.String(required=True, validate=[validate.Length(max=150)])
+    genres_id = fields.Integer(dump_only=True)
+    release_date = fields.DateTime(dump_only=True)
+    producer_id = fields.Integer(dump_only=True)
+    body = fields.String(required=True, validate=[validate.Length(max=500)])
+    poster = fields.String(required=True)
     user_id = fields.Integer(dump_only=True)
     publication = fields.DateTime(dump_only=True)
 

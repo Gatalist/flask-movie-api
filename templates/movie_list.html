@@ -8,7 +8,9 @@
 {% block content %}
 
   <div class="row row-cols-1 row-cols-md-4 g-4">
-    {% for movie in movies %}
+    {{movies.items}}
+
+    {% for movie in pages.items %}
       <div class="col">
         <div class="card">
           <img src="{{movie.poster}}" class="card-img-top" alt="{{movie.title}}" style="width: 300px">
@@ -22,5 +24,7 @@
       </div>
     {% endfor %}
   </div>
+
+  {% include 'include/pagination.html' %}
 
 {% endblock content %}
