@@ -6,6 +6,7 @@ from settings import Config
 import os
 from werkzeug.utils import secure_filename
 import uuid
+from slugify import slugify
 
 
 class User(UserMixin, db.Model):
@@ -29,8 +30,9 @@ class User(UserMixin, db.Model):
     def save_image(self, img):
         type_file = img.filename.split('.')[-1]
         img.filename = str(uuid.uuid4()) + '.' + type_file
-        img.save(os.path.join(Config.STATIC_FOLDER, Config.FOLDER_USER, secure_filename(img.filename)))
-        self.poster = os.path.join(Config.FOLDER_USER, secure_filename(img.filename))
+        path = os.path.join(Config.STATIC_FOLDER, Config.FOLDER_MOVIE, secure_filename(img.filename))
+        img.save(path)
+        self.poster = path
         
     def get_image(self):
         return self.poster
@@ -54,8 +56,9 @@ class Genre(UserMixin, db.Model):
     def save_image(self, img):
         type_file = img.filename.split('.')[-1]
         img.filename = str(uuid.uuid4()) + '.' + type_file
-        img.save(os.path.join(Config.STATIC_FOLDER, Config.FOLDER_GENRE, secure_filename(img.filename)))
-        self.poster = os.path.join(Config.FOLDER_GENRE, secure_filename(img.filename))
+        path = os.path.join(Config.STATIC_FOLDER, Config.FOLDER_MOVIE, secure_filename(img.filename))
+        img.save(path)
+        self.poster = path
 
     def get_image(self):
         return self.poster
@@ -74,8 +77,9 @@ class Producer(UserMixin, db.Model):
     def save_image(self, img):
         type_file = img.filename.split('.')[-1]
         img.filename = str(uuid.uuid4()) + '.' + type_file
-        img.save(os.path.join(Config.STATIC_FOLDER, Config.FOLDER_PRODUCER, secure_filename(img.filename)))
-        self.poster = os.path.join(Config.FOLDER_PRODUCER, secure_filename(img.filename))
+        path = os.path.join(Config.STATIC_FOLDER, Config.FOLDER_MOVIE, secure_filename(img.filename))
+        img.save(path)
+        self.poster = path
     
     def get_image(self):
         return self.poster
@@ -94,6 +98,7 @@ class Producer(UserMixin, db.Model):
 class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))
+    slug = db.Column(db.String(150), index=True, unique=True)
     genres_id = db.Column(db.Integer, db.ForeignKey('genre.id'))
     release_date = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     producer_id = db.Column(db.Integer, db.ForeignKey('producer.id'))
@@ -109,8 +114,21 @@ class Movie(db.Model):
     def save_image(self, img):
         type_file = img.filename.split('.')[-1]
         img.filename = str(uuid.uuid4()) + '.' + type_file
-        img.save(os.path.join(Config.STATIC_FOLDER, Config.FOLDER_MOVIE, secure_filename(img.filename)))
-        self.poster = os.path.join(Config.FOLDER_MOVIE, secure_filename(img.filename))
+        path = os.path.join(Config.STATIC_FOLDER, Config.FOLDER_MOVIE, secure_filename(img.filename))
+        img.save(path)
+        self.poster = path
 
     def get_image(self):
         return self.poster
+
+    def get_absolute_url(self):
+        return f'/movie/{self.slug}'
+        # return self.slug
+
+    # def __setattr__(self, key, value):
+    #     super(Movie, self).__setattr__(key, value)
+    #     if key == 'title':
+    #         self.slug = slugify(self.title)
+
+    def __save__(self):
+        self.slug = slugify(self.title)

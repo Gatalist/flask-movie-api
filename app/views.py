@@ -11,6 +11,7 @@ from flask_apispec import marshal_with, use_kwargs
 
 @app.route('/api', methods=['GET'])
 @marshal_with(VideoSchema(many=True))
+@login_required
 def get_list():
     user_id = current_user.id
     return Movie.query.filter(Movie.user_id == user_id).all()
@@ -19,6 +20,7 @@ def get_list():
 @app.route('/api', methods=['POST'])
 @use_kwargs(VideoSchema)
 @marshal_with(VideoSchema)
+@login_required
 def update_list(**kwargs):
     user_id = current_user.id
     new = Movie(user_id=user_id, **kwargs)
@@ -31,6 +33,7 @@ def update_list(**kwargs):
 @app.route('/api/<int:tutorial_id>', methods=['PUT'])
 @use_kwargs(VideoSchema)
 @marshal_with(VideoSchema)
+@login_required
 def update_tutorial(tutorial_id, **kwargs):
     user_id = current_user.id
     item = Movie.query.filter(Movie.id==tutorial_id, Movie.user_id == user_id).first()
@@ -46,6 +49,7 @@ def update_tutorial(tutorial_id, **kwargs):
 
 @app.route('/api/<int:tutorial_id>', methods=['DELETE'])
 @marshal_with(VideoSchema)
+@login_required
 def delete_tutorial(tutorial_id):
     user_id = current_user.id
     item = Movie.query.filter(Movie.id==tutorial_id, Movie.user_id==user_id).first()
@@ -113,3 +117,16 @@ def user(name):
     user = User.query.filter(User.id==user_id).first()
     movies = Movie.query.filter(Movie.user_id==user_id).all()
     return render_template('user.html', user=user, movies=movies)
+
+
+@app.route('/movie', methods=['GET'])
+@login_required
+def movie():
+    movies = Movie.query.all()
+    return render_template('movie_list.html', movies=movies)
+
+@app.route('/movie/<slug>', methods=['GET'])
+@login_required
+def model_detail(slug):
+    movie = Movie.query.filter(Movie.slug==slug).first()
+    return render_template('movie_detail.html', movie=movie)
