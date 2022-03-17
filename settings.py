@@ -5,7 +5,7 @@ import os
 class Config(object):
     DEBUG = True
     HOST = "127.0.0.1"
-    PORT = 5000
+    PORT = 5001
 
     ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
 
@@ -14,14 +14,13 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(ROOT_PATH, 'database.db')
     # postgresql://scott:tiger@localhost/mydatabase
 
-    STATIC_FOLDER = os.path.join(ROOT_PATH, 'static')
+    
     TEMPLATES_FOLDER = os.path.join(ROOT_PATH, 'templates')
-
-    FOLDER_MEDIA = ('media')
+    STATIC_FOLDER = os.path.join(ROOT_PATH, 'static')
+    FOLDER_MEDIA = 'media'
 
     FOLDER_USER = os.path.join(FOLDER_MEDIA, 'user')
     FOLDER_MOVIE = os.path.join(FOLDER_MEDIA, 'movie')
-    FOLDER_GENRE = os.path.join(FOLDER_MEDIA, 'genre')
     FOLDER_PRODUCER = os.path.join(FOLDER_MEDIA, 'producer')
 
 

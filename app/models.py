@@ -26,16 +26,6 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-    
-    def save_image(self, img):
-        type_file = img.filename.split('.')[-1]
-        img.filename = str(uuid.uuid4()) + '.' + type_file
-        path = os.path.join(Config.STATIC_FOLDER, Config.FOLDER_MOVIE, secure_filename(img.filename))
-        img.save(path)
-        self.poster = path
-        
-    def get_image(self):
-        return self.poster
 
 
 @login.user_loader
@@ -46,22 +36,11 @@ def load_user(id):
 class Genre(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
-    poster = db.Column(db.String())
     
     movies = db.relationship('Movie', backref='genre', lazy='dynamic')
 
     def __repr__(self):
         return self.name
-
-    def save_image(self, img):
-        type_file = img.filename.split('.')[-1]
-        img.filename = str(uuid.uuid4()) + '.' + type_file
-        path = os.path.join(Config.STATIC_FOLDER, Config.FOLDER_MOVIE, secure_filename(img.filename))
-        img.save(path)
-        self.poster = path
-
-    def get_image(self):
-        return self.poster
 
 
 class Producer(UserMixin, db.Model):
@@ -73,16 +52,6 @@ class Producer(UserMixin, db.Model):
 
     def __repr__(self):
         return self.name
-
-    def save_image(self, img):
-        type_file = img.filename.split('.')[-1]
-        img.filename = str(uuid.uuid4()) + '.' + type_file
-        path = os.path.join(Config.STATIC_FOLDER, Config.FOLDER_MOVIE, secure_filename(img.filename))
-        img.save(path)
-        self.poster = path
-    
-    def get_image(self):
-        return self.poster
 
 
 # class Rating(UserMixin, db.Model):
@@ -111,16 +80,6 @@ class Movie(db.Model):
     def __repr__(self):
         return self.title
 
-    def save_image(self, img):
-        type_file = img.filename.split('.')[-1]
-        img.filename = str(uuid.uuid4()) + '.' + type_file
-        path = os.path.join(Config.STATIC_FOLDER, Config.FOLDER_MOVIE, secure_filename(img.filename))
-        img.save(path)
-        self.poster = path
-
-    def get_image(self):
-        return self.poster
-
     def get_absolute_url(self):
         return f'/movie/{self.slug}'
 
@@ -129,5 +88,5 @@ class Movie(db.Model):
     #     if key == 'title':
     #         self.slug = slugify(self.title)
 
-    def __save__(self):
-        self.slug = slugify(self.title)
+    # def __save__(self):
+    #     self.slug = slugify(self.title)

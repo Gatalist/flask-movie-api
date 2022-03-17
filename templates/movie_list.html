@@ -8,12 +8,10 @@
 {% block content %}
 
   <div class="row row-cols-1 row-cols-md-4 g-4">
-    {{movies.items}}
-
     {% for movie in pages.items %}
       <div class="col">
         <div class="card">
-          <img src="{{movie.poster}}" class="card-img-top" alt="{{movie.title}}" style="width: 300px">
+          <img src="{{ url_for('static', filename=movie.poster) }}" class="card-img-top" alt="{{movie.title}}" style="width: 300px">
           <div class="card-body">
             <h5 class="card-title">{{movie.title}}</h5>
             <p class="card-text">{{movie.body}}</p>
