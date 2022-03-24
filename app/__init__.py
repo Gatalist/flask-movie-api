@@ -3,10 +3,13 @@ from settings import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
+# from flask_admin.contrib.sqla import ModelView
+# from flask_admin import Admin
 # serialized
 from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec import APISpec
 from flask_apispec.extension import FlaskApiSpec
+
 
 
 # base aplication
@@ -20,11 +23,14 @@ app.static_folder = Config.STATIC_FOLDER
 # test client for unit test
 client = app.test_client()
 
+
 # create instance DataBase
 db = SQLAlchemy(app)
 
+
 # class instance Migrate
 migrate = Migrate(app, db)
+
 
 # docs api
 docs = FlaskApiSpec()
@@ -40,20 +46,32 @@ app.config.update({
     'APISPEC_SWAGGER_URL': '/swagger/'
 })
 
+
 # class instance Login
 login = LoginManager(app)
 login.login_view = 'login'
 
 
+# class instance Admin panel flask
+# admin = Admin(app)
+
+
+
 from app import views  # conect views
 from app.models import User, Movie, Genre, Producer  # conect model for migrations
+
+# add model in see admin panel
+# admin.add_view(ModelView(User, db.session))
+# admin.add_view(ModelView(Movie, db.session))
+# admin.add_view(ModelView(Genre, db.session))
+# admin.add_view(ModelView(Producer, db.session))
+
 
 
 docs.register(views.get_list)
 docs.register(views.update_list)
 docs.register(views.update_tutorial)
 docs.register(views.delete_tutorial)
-
 
 # функцию обработчика flask shell, вы можете работать с объектами базы данных, не импортируя их
 @app.shell_context_processor

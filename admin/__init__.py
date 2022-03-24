@@ -33,6 +33,7 @@ def admin_movie_add():
 
     form = MovieForm()
     form.genres_id.choices = [(i.id, i.name) for i in genre]
+    form.genres.choices = [(i.id, i.name) for i in genre]
     form.producer_id.choices = [(i.id, i.name) for i in producer]
 
     if form.validate_on_submit():
