@@ -13,6 +13,9 @@ movie_genre = db.Table('movie_genre',
     db.Column('movie_id', db.Integer, db.ForeignKey('movie.id')),
     db.Column('genre_id', db.Integer, db.ForeignKey('genre.id')),)
 
+movie_rating = db.Table('movie_rating',
+    db.Column('movie_id', db.Integer, db.ForeignKey('movie.id')),
+    db.Column('rating_id', db.Integer, db.ForeignKey('rating.id')),)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -56,14 +59,24 @@ class Producer(UserMixin, db.Model):
         return self.name
 
 
-# class Rating(UserMixin, db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     star = db.Column(db.Integer(), unique=True)
-    
-#     posts = db.relationship('Post', backref='author', lazy='dynamic')
+class Star(UserMixin, db.Model):
+    """Звезда рейтинга"""
+    id = db.Column(db.Integer, primary_key=True)
+    value = db.Column("Значение", db.Integer(), unique=True)
 
-#     def __repr__(self):
-#         return self.star
+    def __repr__(self):
+        return f'{self.value}'
+
+
+class Rating(UserMixin, db.Model):
+    """Рейтинг"""
+    id = db.Column(db.Integer, primary_key=True)
+    # session_key = db.Column("Ключ сессии", max_length=128, blank=True, null=True, default=None)
+    star = db.Column(db.Integer(), db.ForeignKey('star.id'))
+    movies = db.relationship('Movie', backref='rating', lazy='dynamic')
+
+    def __repr__(self):
+        return self.star
 
 
 class Movie(db.Model):
@@ -74,12 +87,13 @@ class Movie(db.Model):
     release_date = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     producer_id = db.Column(db.Integer, db.ForeignKey('producer.id'))
     body = db.Column(db.Text(500))
-    # rating = db.Column(db.String(100))
+    rating_id = db.Column(db.Integer, db.ForeignKey('rating.id'))
     poster = db.Column(db.String())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     publication = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     genres = db.relationship('Genre', secondary=movie_genre, backref=db.backref('movie', lazy='dynamic'))
+    ratings = db.relationship('Rating', secondary=movie_rating, backref=db.backref('movie', lazy='dynamic'))
 
     def __repr__(self):
         return self.title

@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request, jsonify
+from flask import render_template, flash, redirect, url_for, request, jsonify, session
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
@@ -6,7 +6,8 @@ from app.forms import LoginForm, RegistrationForm
 from app.models import User, Movie
 from .schemas import VideoSchema
 from flask_apispec import marshal_with, use_kwargs
-
+from .service import save_image
+from settings import Config
 
 
 @app.route('/api', methods=['GET'])
@@ -80,8 +81,9 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
+        print('valid')
         user = User.query.filter_by(name=form.name.data).first()
-
+        print(user)
         if user is None or not user.check_password(form.password.data):
             flash('Invalid name or password')
             return redirect(url_for('login'))
@@ -111,9 +113,8 @@ def register():
     form = RegistrationForm()
     
     if form.validate_on_submit():
-        user = User(name=form.name.data, email=form.email.data)
+        user = User(name=form.name.data, email=form.email.data, poster=save_image(form.poster.data, Config.FOLDER_USER))
         user.set_password(form.password.data)
-        user.save_image(form.poster.data)
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user!')
@@ -132,20 +133,38 @@ def user(name):
     return render_template('user.html', user=user, movies=movies)
 
 
-@app.route('/movie', methods=['GET'])
+@app.route('/movie', methods=['GET', 'POST'])
 @login_required
 def movie():
+    movie_sorted = request.values.get('sorted')
+    
+    if movie_sorted:
+        session['sorted'] = movie_sorted
+    
     q = request.args.get('q')
-    page = request.args.get('page', 1, type=int)
-
     if q:
-        movies = Movie.query.filter(Movie.title.contains(q) | Movie.body.contains(q))
+        if session['sorted']:
+            if session['sorted'] == 'release_date.asc':
+                movies = Movie.query.filter(Movie.title.contains(q) | Movie.body.contains(q)).order_by(Movie.release_date.asc())
+            elif session['sorted'] == 'release_date.desc':
+                movies = Movie.query.filter(Movie.title.contains(q) | Movie.body.contains(q)).order_by(Movie.release_date.desc())
+        else:
+            movies = Movie.query.filter(Movie.title.contains(q) | Movie.body.contains(q))
     else:
-        movies = Movie.query
+        if session['sorted']:
+            if session['sorted'] == 'release_date.asc':
+                print('release_date.asc')
+                movies = Movie.query.order_by(Movie.release_date.asc())
+            elif session['sorted'] == 'release_date.desc':
+                print('release_date.desc')
+                movies = Movie.query.order_by(Movie.release_date.desc())
+        else:
+            movies = Movie.query
 
+    page = request.args.get('page', 1, type=int)
     pages = movies.paginate(page, 10, False)
 
-    return render_template('movie_list.html', movies=movies, pages=pages)
+    return render_template('movie_list.html', movies=movies, pages=pages, q=q)
 
 
 @app.route('/movie/<slug>', methods=['GET'])

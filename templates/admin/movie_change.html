@@ -49,6 +49,14 @@
       </div>
 
       <div class='col-sm-6'>
+        {{ form.rating_id.label(class_='form-label') }}<br>
+        {{ form.rating_id(class_='form-control') }}<br>
+        {% for error in form.rating_id.errors %}
+          <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+      </div>
+
+      <div class='col-sm-6'>
         {{ form.producer_id.label(class_='form-label') }}<br>
         {{ form.producer_id(class_='form-control') }}<br>
         {% for error in form.producer_id.errors %}

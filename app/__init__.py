@@ -11,7 +11,6 @@ from apispec import APISpec
 from flask_apispec.extension import FlaskApiSpec
 
 
-
 # base aplication
 app = Flask(__name__) #, static_url_path='', static_folder='static', template_folder='templates')
 app.config.from_object(Config)
@@ -36,6 +35,7 @@ migrate = Migrate(app, db)
 docs = FlaskApiSpec()
 docs.init_app(app)
 
+
 app.config.update({
     'APISPEC_SPEC': APISpec(
         title='videoblog',
@@ -56,9 +56,9 @@ login.login_view = 'login'
 # admin = Admin(app)
 
 
-
 from app import views  # conect views
 from app.models import User, Movie, Genre, Producer  # conect model for migrations
+
 
 # add model in see admin panel
 # admin.add_view(ModelView(User, db.session))
@@ -67,11 +67,11 @@ from app.models import User, Movie, Genre, Producer  # conect model for migratio
 # admin.add_view(ModelView(Producer, db.session))
 
 
-
 docs.register(views.get_list)
 docs.register(views.update_list)
 docs.register(views.update_tutorial)
 docs.register(views.delete_tutorial)
+
 
 # функцию обработчика flask shell, вы можете работать с объектами базы данных, не импортируя их
 @app.shell_context_processor

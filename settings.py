@@ -5,7 +5,7 @@ import os
 class Config(object):
     DEBUG = True
     HOST = "127.0.0.1"
-    PORT = 5001
+    PORT = 5000
 
     ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
 

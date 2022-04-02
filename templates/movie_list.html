@@ -7,21 +7,82 @@
 
 {% block content %}
 
-  <div class="row row-cols-1 row-cols-md-4 g-4">
-    {% for movie in pages.items %}
-      <div class="col">
-        <div class="card">
-          <img src="{{ url_for('static', filename=movie.poster) }}" class="card-img-top" alt="{{movie.title}}" style="width: 300px">
-          <div class="card-body">
-            <h5 class="card-title">{{movie.title}}</h5>
-            <p class="card-text">{{movie.body}}</p>
-            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-          </div>
-          <a href="{{movie.get_absolute_url()}}" class="btn btn-primary">Go somewhere</a>
-        </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <select class="form-select" id='sorted-movie'>
+          {{ session.sorted }}
+          <option name="release_date+" value="release_date.asc">date +</option>
+          <option name="release_date-" value="release_date.desc">date -</option>
+        </select>
       </div>
-    {% endfor %}
+    </div>
+    
+    </br>
+    
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+      {% for movie in pages.items %}
+        <div class="col">
+          <div class="card">
+            <img src="{{ url_for('static', filename=movie.poster) }}" class="card-img-top" alt="{{movie.title}}" style="width: 300px">
+            <div class="card-body">
+              <h5 class="card-title">{{movie.title}}</h5>
+              <p class="card-text">{{movie.body}}</p>
+              <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+            </div>
+            <a href="{{movie.get_absolute_url()}}" class="btn btn-primary">Go somewhere</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
   </div>
+
+  <script>
+    let sorted = document.getElementById('sorted-movie').querySelectorAll('option');
+    for (let i = 0; i < sorted.length; i++) { 
+      sorted[i].addEventListener("click", function(evt) {
+        let data = {};
+        data["csrfmiddlewaretoken"] = getCookie('csrftoken');
+        data["sorted"] = sorted[i].value
+        url = '/movie';
+        console.log(data, url)
+        ajaxSendServer(data, url);
+      });
+    }
+
+    // ajax запрос на сервер
+    let ajaxSendServer = (data, url) => {
+      $.ajax({
+        url: url,
+        type: 'POST',
+        data: data,
+        cashe: true,
+        success: function(data) {
+          console.log("OK");
+          window.location.reload();
+        },
+        error: function() {
+         	console.log("error");
+         }
+      })
+    };
+
+    function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+              var cookie = jQuery.trim(cookies[i]);
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+    }
+  </script>
 
   {% include 'include/pagination.html' %}
 
